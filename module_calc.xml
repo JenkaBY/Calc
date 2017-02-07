@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_calc" default="compile.module.calc">
+  <dirname property="module.calc.basedir" file="${ant.file.module_calc}"/>
+  
+  <property name="module.jdk.home.calc" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.calc" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.calc" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.calc" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="calc.output.dir" value="${module.calc.basedir}/out/production/Calc"/>
+  <property name="calc.testoutput.dir" value="${module.calc.basedir}/out/test/Calc"/>
+  
+  <path id="calc.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="calc.module.production.classpath">
+    <path refid="${module.jdk.classpath.calc}"/>
+  </path>
+  
+  <path id="calc.runtime.production.module.classpath">
+    <pathelement location="${calc.output.dir}"/>
+  </path>
+  
+  <path id="calc.module.classpath">
+    <path refid="${module.jdk.classpath.calc}"/>
+    <pathelement location="${calc.output.dir}"/>
+  </path>
+  
+  <path id="calc.runtime.module.classpath">
+    <pathelement location="${calc.testoutput.dir}"/>
+    <pathelement location="${calc.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.calc">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.calc">
+    <patternset refid="excluded.from.module.calc"/>
+  </patternset>
+  
+  <path id="calc.module.sourcepath">
+    <dirset dir="${module.calc.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.calc" depends="compile.module.calc.production,compile.module.calc.tests" description="Compile module Calc"/>
+  
+  <target name="compile.module.calc.production" depends="register.custom.compilers" description="Compile module Calc; production classes">
+    <mkdir dir="${calc.output.dir}"/>
+    <javac2 destdir="${calc.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.calc}/javac">
+      <compilerarg line="${compiler.args.calc}"/>
+      <bootclasspath refid="calc.module.bootclasspath"/>
+      <classpath refid="calc.module.production.classpath"/>
+      <src refid="calc.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.calc"/>
+    </javac2>
+    
+    <copy todir="${calc.output.dir}">
+      <fileset dir="${module.calc.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.calc.tests" depends="register.custom.compilers,compile.module.calc.production" description="compile module Calc; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.calc" description="cleanup module">
+    <delete dir="${calc.output.dir}"/>
+    <delete dir="${calc.testoutput.dir}"/>
+  </target>
+</project>
